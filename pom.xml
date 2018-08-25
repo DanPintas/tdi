@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>es.danpintas</groupId>
+  <artifactId>tdi</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+
+  <developers>
+    <developer>
+      <id>danpintas</id>
+      <name>Daniel Salas</name>
+      <email>danpintas@gmail.com</email>
+      <roles>
+        <role>Java Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>Apache License Version 2.0</name>
+      <distribution>manual</distribution>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+
+  <modules>
+    <module>tdi-core</module>
+  </modules>
+
+  <properties>
+
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.report.outputEncoding>UTF-8</project.report.outputEncoding>
+
+    <slf4j.version>1.7.25</slf4j.version>
+    <junit.version>4.12</junit.version>
+    <logback.version>1.2.3</logback.version>
+
+    <javax.inject.version>1</javax.inject.version>
+
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>${javax.inject.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject-tck</artifactId>
+        <version>${javax.inject.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>
