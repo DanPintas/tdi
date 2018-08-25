@@ -1,4 +1,4 @@
-package es.danpintas.di;
+package es.danpintas.tdi;
 
 import org.atinject.tck.Tck;
 import org.atinject.tck.auto.Car;
