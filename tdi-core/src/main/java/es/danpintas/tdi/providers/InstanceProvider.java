@@ -35,181 +35,178 @@ import es.danpintas.tdi.keys.BindingKey;
 
 /**
  * Underlying {@link Provider}, always initializing an instance.
- * 
- * @author danpintas
  *
  * @param <T> Type to instantiate.
+ * @author danpintas
  */
 public final class InstanceProvider<T> implements Provider<T> {
-
-  private final ConstructorInjector<T> constructorInjector;
-  private final MemberInjector[] staticMemberInjectors;
-  private final MemberInjector[] memberInjectors;
-  private final Method postConstruct;
-  private final Method preDestroy;
-  private final Consumer<Runnable> destroyer;
-
-  private final Consumer<MemberInjector[]> staticInjector;
-
-  /**
-   * Constructor.
-   * 
-   * @param typeData {@link TypeData} for the instantiated {@link Class}.
-   * @param fun {@link Function} defining how to get a {@link Provider} from a {@link BindingKey}.
-   * @param staticInjector {@link Consumer} adding the static members to the injector context.
-   * @param destroyer {@link Consumer} registering a {@link PreDestroy} handle.
-   */
-  public InstanceProvider(TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun,
-      Consumer<MemberInjector[]> staticInjector, Consumer<Runnable> destroyer) {
-
-    @SuppressWarnings("unchecked")
-    Class<? extends T> rawType = (Class<? extends T>) typeData.getRawType();
-
-    this.constructorInjector = initConstructor(rawType, typeData, fun);
-    this.staticInjector = staticInjector;
-    this.destroyer = destroyer;
-
-    List<Class<?>> typeHierarchy = getTypeHierarchy(rawType);
-    int hierarchySize = typeHierarchy.size();
-    List<List<Field>> tempFields = new ArrayList<>(typeHierarchy.size());
-    List<List<Method>> tempMethods = new ArrayList<>(typeHierarchy.size());
-    for (Class<?> type : typeHierarchy)
-      parseType(type, tempFields, tempMethods);
-    removeOverridden(tempMethods);
-    removeNotInject(tempMethods);
-    List<MemberInjector> staticInjectorsList = new LinkedList<>();
-    List<MemberInjector> injectorsList = new LinkedList<>();
-    for (int i = 0; i < hierarchySize; i++) {
-      addFields(typeData, fun, tempFields.get(i), staticInjectorsList, injectorsList);
-      addInjectors(typeData, fun, tempMethods.get(i), staticInjectorsList, injectorsList);
-    }
-
-    staticMemberInjectors =
-        staticInjectorsList.toArray(new MemberInjector[0]);
-    memberInjectors = injectorsList.toArray(new MemberInjector[0]);
-
-    postConstruct = getPostConstructMethod(rawType);
-    if (postConstruct != null
-        && (!Modifier.isPublic(postConstruct.getDeclaringClass().getModifiers())
-            || !Modifier.isPublic(postConstruct.getModifiers())))
-      postConstruct.setAccessible(true);
-    preDestroy = getPreDestroyMethod(rawType);
-    if (preDestroy != null && (!Modifier.isPublic(preDestroy.getDeclaringClass().getModifiers())
-        || !Modifier.isPublic(preDestroy.getModifiers())))
-      preDestroy.setAccessible(true);
-  }
-
-  private void parseType(Class<?> subType, List<List<Field>> tempFields,
-      List<List<Method>> tempMethods) {
-    tempFields.add(getInjectFields(subType));
-    tempMethods.add(getMethods(subType));
-  }
-
-  private ConstructorInjector<T> initConstructor(Class<? extends T> type,
-      TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun) {
-    try {
-      Constructor<? extends T> c = getInjectConstructor(type);
-      if (c == null)
-        c = type.getDeclaredConstructor();
-      return new ConstructorInjector<>(typeData, fun, c);
-    } catch (NoSuchMethodException t) {
-      throw new InjectException(t);
-    }
-  }
-
-  private void removeOverridden(List<List<Method>> tempMethods) {
-    List<Method> included = new LinkedList<>();
-    for (int i = tempMethods.size() - 1; i >= 0; i--)
-      removeOverriddenSub(included, tempMethods.get(i));
-  }
-
-  private void removeOverriddenSub(List<Method> included, List<Method> subList) {
-    for (Iterator<Method> iterator = subList.iterator(); iterator.hasNext();) {
-      Method method = iterator.next();
-      boolean overridden = false;
-      for (Method sub : included) {
-        if (isOverride(method, sub)) {
-          overridden = true;
-          break;
+    
+    private final ConstructorInjector<T> constructorInjector;
+    private final MemberInjector[] staticMemberInjectors;
+    private final MemberInjector[] memberInjectors;
+    private final Method postConstruct;
+    private final Method preDestroy;
+    private final Consumer<Runnable> destroyer;
+    
+    private final Consumer<MemberInjector[]> staticInjector;
+    
+    /**
+     * Constructor.
+     *
+     * @param typeData       {@link TypeData} for the instantiated {@link Class}.
+     * @param fun            {@link Function} defining how to get a {@link Provider} from a {@link BindingKey}.
+     * @param staticInjector {@link Consumer} adding the static members to the injector context.
+     * @param destroyer      {@link Consumer} registering a {@link PreDestroy} handle.
+     */
+    public InstanceProvider(TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun,
+                            Consumer<MemberInjector[]> staticInjector, Consumer<Runnable> destroyer) {
+        
+        @SuppressWarnings("unchecked")
+        Class<? extends T> rawType = (Class<? extends T>) typeData.getRawType();
+        
+        this.constructorInjector = initConstructor(rawType, typeData, fun);
+        this.staticInjector = staticInjector;
+        this.destroyer = destroyer;
+        
+        List<Class<?>> typeHierarchy = getTypeHierarchy(rawType);
+        int hierarchySize = typeHierarchy.size();
+        List<List<Field>> tempFields = new ArrayList<>(typeHierarchy.size());
+        List<List<Method>> tempMethods = new ArrayList<>(typeHierarchy.size());
+        for (Class<?> type : typeHierarchy)
+            parseType(type, tempFields, tempMethods);
+        removeOverridden(tempMethods);
+        removeNotInject(tempMethods);
+        List<MemberInjector> staticInjectorsList = new LinkedList<>();
+        List<MemberInjector> injectorsList = new LinkedList<>();
+        for (int i = 0; i < hierarchySize; i++) {
+            addFields(typeData, fun, tempFields.get(i), staticInjectorsList, injectorsList);
+            addInjectors(typeData, fun, tempMethods.get(i), staticInjectorsList, injectorsList);
         }
-      }
-      if (overridden)
-        iterator.remove();
-      else
-        included.add(method);
+        
+        staticMemberInjectors =
+                staticInjectorsList.toArray(new MemberInjector[0]);
+        memberInjectors = injectorsList.toArray(new MemberInjector[0]);
+        
+        postConstruct = getPostConstructMethod(rawType);
+        if (postConstruct != null)
+            postConstruct.setAccessible(true);
+        
+        preDestroy = getPreDestroyMethod(rawType);
+        if (preDestroy != null)
+            preDestroy.setAccessible(true);
     }
-  }
-
-  private void removeNotInject(List<List<Method>> tempMethods) {
-    for (List<Method> subList : tempMethods)
-      subList.removeIf(method -> method.getAnnotation(Inject.class) == null);
-  }
-
-  private void addFields(TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun,
-      List<Field> subTemp, List<MemberInjector> staticInjectorsList,
-      List<MemberInjector> injectorsList) {
-    for (Field field : subTemp) {
-      FieldInjector fInjector = new FieldInjector(typeData, fun, field);
-      if (Modifier.isStatic(field.getModifiers()))
-        staticInjectorsList.add(fInjector);
-      else
-        injectorsList.add(fInjector);
+    
+    private void parseType(Class<?> subType, List<List<Field>> tempFields,
+                           List<List<Method>> tempMethods) {
+        tempFields.add(getInjectFields(subType));
+        tempMethods.add(getMethods(subType));
     }
-  }
-
-  private void addInjectors(TypeData<? extends T> typeData,
-      Function<BindingKey<?>, Provider<?>> fun, List<Method> subTemp,
-      List<MemberInjector> staticInjectorsList, List<MemberInjector> injectorsList) {
-    for (Method method : subTemp) {
-      MethodInjector mInjector = new MethodInjector(typeData, fun, method);
-      if (Modifier.isStatic(method.getModifiers()))
-        staticInjectorsList.add(mInjector);
-      else
-        injectorsList.add(mInjector);
+    
+    private ConstructorInjector<T> initConstructor(Class<? extends T> type,
+                                                   TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun) {
+        try {
+            Constructor<? extends T> c = getInjectConstructor(type);
+            if (c == null)
+                c = type.getDeclaredConstructor();
+            return new ConstructorInjector<>(typeData, fun, c);
+        } catch (NoSuchMethodException t) {
+            throw new InjectException(t);
+        }
     }
-  }
-
-  @Override
-  public T get() {
-    T instance = constructorInjector.inject();
-    inject(instance);
-    if (postConstruct != null)
-      postConstruct(instance);
-    if (preDestroy != null) {
-      destroyer.accept(() -> preDestroy(instance));
+    
+    private void removeOverridden(List<List<Method>> tempMethods) {
+        List<Method> included = new LinkedList<>();
+        for (int i = tempMethods.size() - 1; i >= 0; i--)
+            removeOverriddenSub(included, tempMethods.get(i));
     }
-    return instance;
-  }
-
-  private void inject(T instance) {
-    for (MemberInjector memberInjector : memberInjectors)
-      memberInjector.inject(instance);
-  }
-
-  private void postConstruct(T instance) {
-    try {
-      postConstruct.invoke(instance);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new InjectException(e);
+    
+    private void removeOverriddenSub(List<Method> included, List<Method> subList) {
+        for (Iterator<Method> iterator = subList.iterator(); iterator.hasNext(); ) {
+            Method method = iterator.next();
+            boolean overridden = false;
+            for (Method sub : included) {
+                if (isOverride(method, sub)) {
+                    overridden = true;
+                    break;
+                }
+            }
+            if (overridden)
+                iterator.remove();
+            else
+                included.add(method);
+        }
     }
-  }
-
-  private void preDestroy(T instance) {
-    try {
-      preDestroy.invoke(instance);
-    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new InjectException(e);
+    
+    private void removeNotInject(List<List<Method>> tempMethods) {
+        for (List<Method> subList : tempMethods)
+            subList.removeIf(method -> method.getAnnotation(Inject.class) == null);
     }
-  }
-
-  /**
-   * Initializes the dependency injection context.
-   */
-  public void initProviders() {
-    constructorInjector.providerCheck();
-    for (MemberInjector memberInjector : memberInjectors)
-      memberInjector.providerCheck();
-    staticInjector.accept(staticMemberInjectors);
-  }
-
+    
+    private void addFields(TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun,
+                           List<Field> subTemp, List<MemberInjector> staticInjectorsList,
+                           List<MemberInjector> injectorsList) {
+        for (Field field : subTemp) {
+            FieldInjector fInjector = new FieldInjector(typeData, fun, field);
+            if (Modifier.isStatic(field.getModifiers()))
+                staticInjectorsList.add(fInjector);
+            else
+                injectorsList.add(fInjector);
+        }
+    }
+    
+    private void addInjectors(TypeData<? extends T> typeData,
+                              Function<BindingKey<?>, Provider<?>> fun, List<Method> subTemp,
+                              List<MemberInjector> staticInjectorsList, List<MemberInjector> injectorsList) {
+        for (Method method : subTemp) {
+            MethodInjector mInjector = new MethodInjector(typeData, fun, method);
+            if (Modifier.isStatic(method.getModifiers()))
+                staticInjectorsList.add(mInjector);
+            else
+                injectorsList.add(mInjector);
+        }
+    }
+    
+    @Override
+    public T get() {
+        T instance = constructorInjector.inject();
+        inject(instance);
+        if (postConstruct != null)
+            postConstruct(instance);
+        if (preDestroy != null) {
+            destroyer.accept(() -> preDestroy(instance));
+        }
+        return instance;
+    }
+    
+    private void inject(T instance) {
+        for (MemberInjector memberInjector : memberInjectors)
+            memberInjector.inject(instance);
+    }
+    
+    private void postConstruct(T instance) {
+        try {
+            postConstruct.invoke(instance);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new InjectException(e);
+        }
+    }
+    
+    private void preDestroy(T instance) {
+        try {
+            preDestroy.invoke(instance);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new InjectException(e);
+        }
+    }
+    
+    /**
+     * Initializes the dependency injection context.
+     */
+    public void initProviders() {
+        constructorInjector.providerCheck();
+        for (MemberInjector memberInjector : memberInjectors)
+            memberInjector.providerCheck();
+        staticInjector.accept(staticMemberInjectors);
+    }
+    
 }

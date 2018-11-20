@@ -13,63 +13,63 @@ import es.danpintas.tdi.keys.BindingKey;
 
 /**
  * {@link Method} injector.
- * 
+ *
  * @author danpintas
  */
 public final class MethodInjector extends ExecutableInjector implements MemberInjector {
-
-  private final Method method;
-
-  /**
-   * Constructor.
-   * 
-   * @param typeData {@link TypeData} for the constructor class.
-   * @param fun {@link Function} retrieving the {@link Provider} for a {@link BindingKey}.
-   * @param method {@link Method} to inject.
-   */
-  public MethodInjector(TypeData<?> typeData, Function<BindingKey<?>, Provider<?>> fun,
-      Method method) {
-    super(typeData, fun, method);
-    this.method = method;
-  }
-
-  @Override
-  public void inject(Object instance) {
-    try {
-      method.invoke(instance, injectArgs());
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new InjectException(e);
+    
+    private final Method method;
+    
+    /**
+     * Constructor.
+     *
+     * @param typeData {@link TypeData} for the constructor class.
+     * @param fun      {@link Function} retrieving the {@link Provider} for a {@link BindingKey}.
+     * @param method   {@link Method} to inject.
+     */
+    public MethodInjector(TypeData<?> typeData, Function<BindingKey<?>, Provider<?>> fun,
+                          Method method) {
+        super(typeData, fun, method);
+        this.method = method;
     }
-  }
-
-  @Override
-  public Class<?> getDeclaringClass() {
-    return method.getDeclaringClass();
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((method == null) ? 0 : method.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    MethodInjector other = (MethodInjector) obj;
-    return Objects.equals(method, other.method);
-  }
-
-  @Override
-  public boolean isField() {
-    return false;
-  }
-
+    
+    @Override
+    public void inject(Object instance) {
+        try {
+            method.invoke(instance, injectArgs());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new InjectException(e);
+        }
+    }
+    
+    @Override
+    public Class<?> getDeclaringClass() {
+        return method.getDeclaringClass();
+    }
+    
+    @Override
+    public boolean isField() {
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((method == null) ? 0 : method.hashCode());
+        return result;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MethodInjector other = (MethodInjector) obj;
+        return Objects.equals(method, other.method);
+    }
+    
 }

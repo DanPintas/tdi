@@ -10,25 +10,25 @@ import es.danpintas.tdi.keys.ScopeKey;
  * <li>Prototype (default)</li>
  * <li>{@link Singleton}</li>
  * </ul>
- * 
+ *
  * @author danpintas
  */
 public class BaseInjector extends AbstractInjector {
-
-  /**
-   * Constructor.
-   * 
-   * @param module First {@link Module}, at least one is required.
-   * @param modules Additional Modules.
-   */
-  public BaseInjector(Module module, Module... modules) {
-    super(module, modules);
-    Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
-  }
-
-  @Override
-  protected ScopeKey[] getScopes() {
-    return new ScopeKey[0];
-  }
-
+    
+    /**
+     * Constructor.
+     *
+     * @param module  First {@link Module}, at least one is required.
+     * @param modules Additional Modules.
+     */
+    public BaseInjector(Module module, Module... modules) {
+        super(module, modules);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
+    }
+    
+    @Override
+    protected ScopeKey[] getScopes() {
+        return new ScopeKey[0];
+    }
+    
 }
