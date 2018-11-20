@@ -73,8 +73,8 @@ public final class InstanceProvider<T> implements Provider<T> {
     int hierarchySize = typeHierarchy.size();
     List<List<Field>> tempFields = new ArrayList<>(typeHierarchy.size());
     List<List<Method>> tempMethods = new ArrayList<>(typeHierarchy.size());
-    for (Iterator<Class<?>> it = typeHierarchy.iterator(); it.hasNext();)
-      parseType(it.next(), tempFields, tempMethods);
+    for (Class<?> type : typeHierarchy)
+      parseType(type, tempFields, tempMethods);
     removeOverridden(tempMethods);
     removeNotInject(tempMethods);
     List<MemberInjector> staticInjectorsList = new LinkedList<>();
@@ -85,8 +85,8 @@ public final class InstanceProvider<T> implements Provider<T> {
     }
 
     staticMemberInjectors =
-        staticInjectorsList.toArray(new MemberInjector[staticInjectorsList.size()]);
-    memberInjectors = injectorsList.toArray(new MemberInjector[injectorsList.size()]);
+        staticInjectorsList.toArray(new MemberInjector[0]);
+    memberInjectors = injectorsList.toArray(new MemberInjector[0]);
 
     postConstruct = getPostConstructMethod(rawType);
     if (postConstruct != null
@@ -120,10 +120,10 @@ public final class InstanceProvider<T> implements Provider<T> {
   private void removeOverridden(List<List<Method>> tempMethods) {
     List<Method> included = new LinkedList<>();
     for (int i = tempMethods.size() - 1; i >= 0; i--)
-      removeOverridenSub(included, tempMethods.get(i));
+      removeOverriddenSub(included, tempMethods.get(i));
   }
 
-  private void removeOverridenSub(List<Method> included, List<Method> subList) {
+  private void removeOverriddenSub(List<Method> included, List<Method> subList) {
     for (Iterator<Method> iterator = subList.iterator(); iterator.hasNext();) {
       Method method = iterator.next();
       boolean overridden = false;
@@ -141,21 +141,14 @@ public final class InstanceProvider<T> implements Provider<T> {
   }
 
   private void removeNotInject(List<List<Method>> tempMethods) {
-    for (int i = 0; i < tempMethods.size(); i++) {
-      List<Method> subList = tempMethods.get(i);
-      for (Iterator<Method> iterator = subList.iterator(); iterator.hasNext();) {
-        Method method = iterator.next();
-        if (method.getAnnotation(Inject.class) == null)
-          iterator.remove();
-      }
-    }
+    for (List<Method> subList : tempMethods)
+      subList.removeIf(method -> method.getAnnotation(Inject.class) == null);
   }
 
   private void addFields(TypeData<? extends T> typeData, Function<BindingKey<?>, Provider<?>> fun,
       List<Field> subTemp, List<MemberInjector> staticInjectorsList,
       List<MemberInjector> injectorsList) {
-    for (Iterator<Field> subIt = subTemp.iterator(); subIt.hasNext();) {
-      Field field = subIt.next();
+    for (Field field : subTemp) {
       FieldInjector fInjector = new FieldInjector(typeData, fun, field);
       if (Modifier.isStatic(field.getModifiers()))
         staticInjectorsList.add(fInjector);
@@ -167,8 +160,7 @@ public final class InstanceProvider<T> implements Provider<T> {
   private void addInjectors(TypeData<? extends T> typeData,
       Function<BindingKey<?>, Provider<?>> fun, List<Method> subTemp,
       List<MemberInjector> staticInjectorsList, List<MemberInjector> injectorsList) {
-    for (Iterator<Method> subIt = subTemp.iterator(); subIt.hasNext();) {
-      Method method = subIt.next();
+    for (Method method : subTemp) {
       MethodInjector mInjector = new MethodInjector(typeData, fun, method);
       if (Modifier.isStatic(method.getModifiers()))
         staticInjectorsList.add(mInjector);
@@ -180,13 +172,11 @@ public final class InstanceProvider<T> implements Provider<T> {
   @Override
   public T get() {
     T instance = constructorInjector.inject();
-    if (instance != null) {
-      inject(instance);
-      if (postConstruct != null)
-        postConstruct(instance);
-      if (preDestroy != null) {
-        destroyer.accept(() -> preDestroy(instance));
-      }
+    inject(instance);
+    if (postConstruct != null)
+      postConstruct(instance);
+    if (preDestroy != null) {
+      destroyer.accept(() -> preDestroy(instance));
     }
     return instance;
   }

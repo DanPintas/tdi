@@ -24,7 +24,7 @@ public interface Binder {
   /**
    * Starts binding configuration for the given {@code TypeData}.
    * 
-   * @param clazz {@link TypeData} to bind.
+   * @param typeData {@link TypeData} to bind.
    * @return Instantiated {@link BindingConfig}.
    */
   <T> BindingConfig<T> bind(TypeData<T> typeData);

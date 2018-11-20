@@ -23,12 +23,9 @@ public class SingletonProvider<T> extends AbstractProvider<T> {
   }
 
   @Override
-  public T get() {
+  public synchronized T get() {
     if (instance == null)
-      synchronized (this) {
-        if (instance == null)
-          instance = instance();
-      }
+      instance = instance();
     return instance;
   }
 

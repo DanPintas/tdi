@@ -29,10 +29,8 @@ import es.danpintas.tdi.providers.SingletonProvider;
  */
 public abstract class AbstractInjector implements Injector {
 
-  private static final Function<InstanceProvider<?>, Provider<?>> PROTOTYPE =
-      p -> new PrototypeProvider<>(p);
-  private static final Function<InstanceProvider<?>, Provider<?>> SINGLETON =
-      p -> new SingletonProvider<>(p);
+  private static final Function<InstanceProvider<?>, Provider<?>> PROTOTYPE = PrototypeProvider::new;
+  private static final Function<InstanceProvider<?>, Provider<?>> SINGLETON = SingletonProvider::new;
 
   private final List<Binding<?>> builders = new LinkedList<>();
   private final Map<BindingKey<?>, Provider<?>> bindings = new HashMap<>();
@@ -64,9 +62,9 @@ public abstract class AbstractInjector implements Injector {
   }
 
   /**
-   * Fetches the available scopes
+   * Fetches the available scopes.
    * 
-   * @return
+   * @return ScopeKey[]
    */
   protected abstract ScopeKey[] getScopes();
 

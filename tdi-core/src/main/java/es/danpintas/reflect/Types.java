@@ -248,7 +248,7 @@ public final class Types {
    * 
    * @param rawType Main {@link Type} .
    * @param typeArguments {@link Type} arguments for {@code rawType}.
-   * @return
+   * @return ParameterizedType
    */
   public static ParameterizedType parameterizedType(Type rawType, Type... typeArguments) {
     return parameterizedTypeWithOwner(null, rawType, typeArguments);
@@ -260,7 +260,7 @@ public final class Types {
    * @param rawType Owner {@link Type}.
    * @param ownerType Main {@link Type}.
    * @param typeArguments {@link Type} arguments for {@code rawType}.
-   * @return
+   * @return ParameterizedType
    */
   public static ParameterizedType parameterizedTypeWithOwner(Type ownerType, Type rawType,
       Type... typeArguments) {
@@ -270,7 +270,7 @@ public final class Types {
   /**
    * Creates a new {@code GenericArrayType} with the given type argument.
    * 
-   * @param ownerType Argument {@link Type}.
+   * @param componentType Argument {@link Type}.
    * @return {@link GenericArrayType} of {@code rawType}.
    */
   public static GenericArrayType arrayOf(Type componentType) {
@@ -290,7 +290,7 @@ public final class Types {
   /**
    * Creates a new {@code WildcardType} with the given type argument.
    * 
-   * @param ownerType Argument {@link Type}.
+   * @param bound Argument {@link Type}.
    * @return {@link WildcardType} of <{@code ?} super {@code bound}>.
    */
   public static WildcardType supertypeOf(Type bound) {
@@ -358,7 +358,13 @@ public final class Types {
     } else if (type instanceof TypeVariable) {
       ret = false;
     } else {
-      ret = ((CompositeType) canonicalize(type)).isFullySpecified();
+      Type canonicalType = canonicalize(type);
+      if(canonicalType instanceof CompositeType){
+        CompositeType compositeType = (CompositeType) canonicalType;
+        ret = compositeType.isFullySpecified();
+      } else {
+        ret = false;
+      }
     }
     return ret;
   }
@@ -548,7 +554,7 @@ public final class Types {
    * @param type {@link Type} to resolve {@code type} for.
    * @param rawType {@link Class} to resolve {@code type} for.
    * @param unknown {@link TypeVariable} to resolve.
-   * @return {@link Type} of resolved {@link unknown}
+   * @return {@link Type} of resolved unknown.
    */
   public static Type resolveTypeVariable(Type type, Class<?> rawType, TypeVariable<?> unknown) {
     Class<?> declaredByRaw = declaringClassOf(unknown);

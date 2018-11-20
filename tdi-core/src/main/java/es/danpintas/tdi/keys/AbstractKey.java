@@ -1,5 +1,7 @@
 package es.danpintas.tdi.keys;
 
+import java.util.Objects;
+
 /**
  * Abstract implementation for a paired key.
  * 
@@ -42,17 +44,7 @@ public abstract class AbstractKey<A, B> {
     if (getClass() != obj.getClass())
       return false;
     AbstractKey<?, ?> other = (AbstractKey<?, ?>) obj;
-    if (a == null) {
-      if (other.a != null)
-        return false;
-    } else if (!a.equals(other.a))
-      return false;
-    if (b == null) {
-      if (other.b != null)
-        return false;
-    } else if (!b.equals(other.b))
-      return false;
-    return true;
+    return Objects.equals(a, other.a) && Objects.equals(b, other.b);
   }
 
   @Override

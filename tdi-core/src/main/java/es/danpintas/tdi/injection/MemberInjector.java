@@ -19,7 +19,7 @@ public interface MemberInjector {
   void inject(Object instance);
 
   /**
-   * Initializes the {@link Member} injector's {@link Provider}s.
+   * Initializes the {@link Member} injector's {@link javax.inject.Provider}s.
    */
   void providerCheck();
 

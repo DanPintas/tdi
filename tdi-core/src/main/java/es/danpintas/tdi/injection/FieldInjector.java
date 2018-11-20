@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.Objects;
 import java.util.function.Function;
 
 import javax.inject.Provider;
@@ -99,12 +100,7 @@ public final class FieldInjector implements MemberInjector {
     if (getClass() != obj.getClass())
       return false;
     FieldInjector other = (FieldInjector) obj;
-    if (field == null) {
-      if (other.field != null)
-        return false;
-    } else if (!field.equals(other.field))
-      return false;
-    return true;
+    return Objects.equals(field, other.field);
   }
 
 }

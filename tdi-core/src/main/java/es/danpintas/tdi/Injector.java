@@ -21,7 +21,7 @@ public interface Injector {
    */
   default <T> Provider<T> getProvider(Class<T> type) {
     return getProvider(new BindingKey<>(TypeData.get(type), null));
-  };
+  }
 
   /**
    * Gets the provider associated to a given {@code TypeData}.
@@ -31,7 +31,7 @@ public interface Injector {
    */
   default <T> Provider<T> getProvider(TypeData<T> typeData) {
     return getProvider(new BindingKey<>(typeData, null));
-  };
+  }
 
   /**
    * Gets the provider associated to a given {@code BindingKey}.
@@ -44,22 +44,22 @@ public interface Injector {
   /**
    * Gets an instance of a given {@code Class}.
    * 
-   * @param key {@link Class} to get instance for.
+   * @param type {@link Class} to get instance for.
    * @return Instance for the given {@link Class}.
    */
   default <T> T getInstance(Class<T> type) {
     return getProvider(new BindingKey<>(TypeData.get(type), null)).get();
-  };
+  }
 
   /**
    * Gets an instance of a given {@code TypeData}.
    * 
-   * @param key {@link TypeData} to get instance for.
+   * @param typeData {@link TypeData} to get instance for.
    * @return Instance for the given {@link TypeData}.
    */
   default <T> T getInstance(TypeData<T> typeData) {
     return getProvider(new BindingKey<>(typeData, null)).get();
-  };
+  }
 
   /**
    * Gets an instance of a given {@code BindingKey}.
@@ -69,7 +69,7 @@ public interface Injector {
    */
   default <T> T getInstance(BindingKey<T> key) {
     return getProvider(key).get();
-  };
+  }
 
   /**
    * Destroys any declared dependencies, calling {@link PreDestroy} methods.

@@ -2,6 +2,7 @@ package es.danpintas.tdi.injection;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.function.Function;
 
 import javax.inject.Provider;
@@ -63,12 +64,7 @@ public final class MethodInjector extends ExecutableInjector implements MemberIn
     if (getClass() != obj.getClass())
       return false;
     MethodInjector other = (MethodInjector) obj;
-    if (method == null) {
-      if (other.method != null)
-        return false;
-    } else if (!method.equals(other.method))
-      return false;
-    return true;
+    return Objects.equals(method, other.method);
   }
 
   @Override

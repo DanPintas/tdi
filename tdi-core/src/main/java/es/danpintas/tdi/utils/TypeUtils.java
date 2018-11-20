@@ -17,7 +17,11 @@ import javax.inject.Qualifier;
 
 import es.danpintas.tdi.exceptions.InjectException;
 
-public class TypeUtils {
+public final class TypeUtils {
+
+  private TypeUtils(){
+    // utils class
+  }
 
   /**
    * Gets a {@code List} with the {@code Inject} annotated methods of a given {@code Class}.

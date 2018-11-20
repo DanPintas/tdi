@@ -23,7 +23,7 @@ public class BaseInjector extends AbstractInjector {
    */
   public BaseInjector(Module module, Module... modules) {
     super(module, modules);
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> destroy()));
+    Runtime.getRuntime().addShutdownHook(new Thread(this::destroy));
   }
 
   @Override
