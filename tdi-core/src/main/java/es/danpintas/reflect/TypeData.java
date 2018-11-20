@@ -104,57 +104,65 @@ public class TypeData<T> {
         if (toResolve == original) {
           return toResolve;
         }
-
       } else if (toResolve instanceof GenericArrayType) {
-        GenericArrayType original = (GenericArrayType) toResolve;
-        Type componentType = original.getGenericComponentType();
-        Type newComponentType = resolveType(componentType);
-        return componentType == newComponentType ? original : Types.arrayOf(newComponentType);
-
+        return resolveGenericArrayType((GenericArrayType) toResolve);
       } else if (toResolve instanceof ParameterizedType) {
-        ParameterizedType original = (ParameterizedType) toResolve;
-        Type ownerType = original.getOwnerType();
-        Type newOwnerType = resolveType(ownerType);
-        boolean changed = newOwnerType != ownerType;
-
-        Type[] args = original.getActualTypeArguments();
-        for (int t = 0, length = args.length; t < length; t++) {
-          Type resolvedTypeArgument = resolveType(args[t]);
-          if (resolvedTypeArgument != args[t]) {
-            if (!changed) {
-              args = args.clone();
-              changed = true;
-            }
-            args[t] = resolvedTypeArgument;
-          }
-        }
-
-        return changed
-            ? Types.parameterizedTypeWithOwner(newOwnerType, original.getRawType(), args)
-            : original;
-
+        return resolveParameterizedType((ParameterizedType) toResolve);
       } else if (toResolve instanceof WildcardType) {
-        WildcardType original = (WildcardType) toResolve;
-        Type[] originalLowerBound = original.getLowerBounds();
-        Type[] originalUpperBound = original.getUpperBounds();
-
-        if (originalLowerBound.length == 1) {
-          Type lowerBound = resolveType(originalLowerBound[0]);
-          if (lowerBound != originalLowerBound[0]) {
-            return Types.supertypeOf(lowerBound);
-          }
-        } else if (originalUpperBound.length == 1) {
-          Type upperBound = resolveType(originalUpperBound[0]);
-          if (upperBound != originalUpperBound[0]) {
-            return Types.subtypeOf(upperBound);
-          }
-        }
-        return original;
-
+        return resolveWildcardType((WildcardType) toResolve);
       } else {
         return toResolve;
       }
     }
+  }
+
+  private Type resolveGenericArrayType(GenericArrayType toResolve) {
+    GenericArrayType original = toResolve;
+    Type componentType = original.getGenericComponentType();
+    Type newComponentType = resolveType(componentType);
+    return componentType == newComponentType ? original : Types.arrayOf(newComponentType);
+  }
+
+  private Type resolveParameterizedType(ParameterizedType toResolve) {
+    ParameterizedType original = toResolve;
+    Type ownerType = original.getOwnerType();
+    Type newOwnerType = resolveType(ownerType);
+    boolean changed = newOwnerType != ownerType;
+
+    Type[] args = original.getActualTypeArguments();
+    for (int t = 0, length = args.length; t < length; t++) {
+      Type resolvedTypeArgument = resolveType(args[t]);
+      if (resolvedTypeArgument != args[t]) {
+        if (!changed) {
+          args = args.clone();
+          changed = true;
+        }
+        args[t] = resolvedTypeArgument;
+      }
+    }
+
+    return changed
+        ? Types.parameterizedTypeWithOwner(newOwnerType, original.getRawType(), args)
+        : original;
+  }
+
+  private Type resolveWildcardType(WildcardType toResolve) {
+    WildcardType original = toResolve;
+    Type[] originalLowerBound = original.getLowerBounds();
+    Type[] originalUpperBound = original.getUpperBounds();
+
+    if (originalLowerBound.length == 1) {
+      Type lowerBound = resolveType(originalLowerBound[0]);
+      if (lowerBound != originalLowerBound[0]) {
+        return Types.supertypeOf(lowerBound);
+      }
+    } else if (originalUpperBound.length == 1) {
+      Type upperBound = resolveType(originalUpperBound[0]);
+      if (upperBound != originalUpperBound[0]) {
+        return Types.subtypeOf(upperBound);
+      }
+    }
+    return original;
   }
 
   /**
