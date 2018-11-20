@@ -29,8 +29,8 @@ import es.danpintas.tdi.providers.SingletonProvider;
  */
 public abstract class AbstractInjector implements Injector {
 
-  private static final Function<InstanceProvider<?>, Provider<?>> PROTOTYPE = PrototypeProvider::new;
-  private static final Function<InstanceProvider<?>, Provider<?>> SINGLETON = SingletonProvider::new;
+  private static final Function<InstanceProvider, Provider> PROTOTYPE = PrototypeProvider::new;
+  private static final Function<InstanceProvider, Provider> SINGLETON = SingletonProvider::new;
 
   private final List<Binding<?>> builders = new LinkedList<>();
   private final Map<BindingKey<?>, Provider<?>> bindings = new HashMap<>();
@@ -39,7 +39,7 @@ public abstract class AbstractInjector implements Injector {
   private final List<MemberInjector> staticMembers = new LinkedList<>();
   private final List<Runnable> preDestroy = new LinkedList<>();
 
-  private final Map<Class<? extends Annotation>, Function<InstanceProvider<?>, Provider<?>>> scopes =
+  private final Map<Class<? extends Annotation>, Function<InstanceProvider, Provider>> scopes =
       new HashMap<>();
   private final Map<ProviderKey<?>, Provider<?>> providers = new HashMap<>();
 
@@ -91,9 +91,9 @@ public abstract class AbstractInjector implements Injector {
     return provider;
   }
 
-  private Function<InstanceProvider<?>, Provider<?>> getProvision(TypeData<?> implementation,
+  private Function<InstanceProvider, Provider> getProvision(TypeData<?> implementation,
       Class<? extends Annotation> scope) {
-    for (Entry<Class<? extends Annotation>, Function<InstanceProvider<?>, Provider<?>>> entry : scopes
+    for (Entry<Class<? extends Annotation>, Function<InstanceProvider, Provider>> entry : scopes
         .entrySet())
       if (implementation.getRawType().isAnnotationPresent(entry.getKey())
           || entry.getKey().equals(scope))

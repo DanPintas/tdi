@@ -41,7 +41,7 @@ public class TypeData<T> {
    * 
    * @param type Underlying {@link Type}.
    */
-  public static TypeData<?> get(Type type) {
+  public static TypeData get(Type type) {
     return new TypeData<>(type);
   }
 
@@ -83,7 +83,7 @@ public class TypeData<T> {
     return Types.typeToString(type);
   }
 
-  private List<TypeData<?>> resolveAll(Type[] types) {
+  private List<TypeData> resolveAll(Type[] types) {
     TypeData<?>[] result = new TypeData<?>[types.length];
     for (int t = 0; t < types.length; t++) {
       result[t] = resolve(types[t]);
@@ -165,7 +165,7 @@ public class TypeData<T> {
    * @param supertype Superclass of, or interface implemented by, this.
    * @return {@code TypeData} of the given supertype.
    */
-  public TypeData<?> getSupertype(Class<?> supertype) {
+  public TypeData getSupertype(Class<?> supertype) {
     Validations.checkArgument(supertype.isAssignableFrom(rawType), "%s is not a supertype of %s",
         supertype, this.type);
     return resolve(Types.getGenericSupertype(type, rawType, supertype));
@@ -177,7 +177,7 @@ public class TypeData<T> {
    * @param field {@link Field} defined by this or any supertype.
    * @return {@code TypeData} of the given field.
    */
-  public TypeData<?> getFieldType(Field field) {
+  public TypeData getFieldType(Field field) {
     checkAssignableMember(field);
     return resolve(field.getGenericType());
   }
@@ -188,7 +188,7 @@ public class TypeData<T> {
    * @param method {@link Method} defined by this or any supertype.
    * @return {@code TypeData} of the given method return.
    */
-  public TypeData<?> getReturnType(Method method) {
+  public TypeData getReturnType(Method method) {
     checkAssignableMember(method);
     return resolve(method.getGenericReturnType());
   }
@@ -199,7 +199,7 @@ public class TypeData<T> {
    * @param executable {@link Executable} defined by this or any supertype.
    * @return {@link List} with the {@code TypeData} of the given executable's parameters.
    */
-  public List<TypeData<?>> getParameterTypes(Executable executable) {
+  public List<TypeData> getParameterTypes(Executable executable) {
     checkAssignableMember(executable);
     return resolveAll(executable.getGenericParameterTypes());
   }
@@ -210,7 +210,7 @@ public class TypeData<T> {
    * @param executable {@link Executable} defined by this or any supertype.
    * @return {@link List} with the {@code TypeData} of the given executable's exceptions.
    */
-  public List<TypeData<?>> getExceptionTypes(Executable executable) {
+  public List<TypeData> getExceptionTypes(Executable executable) {
     checkAssignableMember(executable);
     return resolveAll(executable.getGenericExceptionTypes());
   }

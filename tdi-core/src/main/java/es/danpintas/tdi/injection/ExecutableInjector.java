@@ -54,7 +54,7 @@ public abstract class ExecutableInjector {
   public void providerCheck() {
     if (providers == null) {
       Parameter[] parameters = executable.getParameters();
-      List<TypeData<?>> parameterTypes = typeData.getParameterTypes(executable);
+      List<TypeData> parameterTypes = typeData.getParameterTypes(executable);
       providers = new Provider<?>[parameters.length];
       for (int i = 0; i < parameters.length; i++) {
         Parameter parameter = parameters[i];

@@ -13,7 +13,7 @@ import es.danpintas.tdi.providers.InstanceProvider;
  * @author danpintas
  */
 public class ScopeKey
-    extends AbstractKey<Class<? extends Annotation>, Function<InstanceProvider<?>, Provider<?>>> {
+    extends AbstractKey<Class<? extends Annotation>, Function<InstanceProvider, Provider>> {
 
   /**
    * Constructor.
@@ -22,7 +22,7 @@ public class ScopeKey
    * @param provision {@link Function} defining how to wrap a {@link Provider}.
    */
   public ScopeKey(Class<? extends Annotation> annotation,
-      Function<InstanceProvider<?>, Provider<?>> provision) {
+      Function<InstanceProvider, Provider> provision) {
     super(annotation, provision);
   }
 
@@ -40,7 +40,7 @@ public class ScopeKey
    * 
    * @return {@link Function} defining how to wrap a {@link Provider}.
    */
-  public Function<InstanceProvider<?>, Provider<?>> getProvision() {
+  public Function<InstanceProvider, Provider> getProvision() {
     return b;
   }
 
