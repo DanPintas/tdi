@@ -39,8 +39,7 @@ public abstract class AbstractInjector implements Injector {
     private final List<MemberInjector> staticMembers = new LinkedList<>();
     private final List<Runnable> preDestroy = new LinkedList<>();
     
-    private final Map<Class<? extends Annotation>, Function<InstanceProvider, Provider>> scopes =
-            new HashMap<>();
+    private final Map<Class<? extends Annotation>, Function<InstanceProvider, Provider>> scopes = new HashMap<>();
     private final Map<ProviderKey<?>, Provider<?>> providers = new HashMap<>();
     
     /**
